@@ -21,13 +21,42 @@ for (let i = 0; i < pokemons.length; i++) {
             allPokemons.push(details); // bruke denne i filtreringen 
             showPokemonCard(details);
     } catch(error) {
-        console.error("Det har skjedd en feil. Kom tilbake senere", error);
+        console.error("Det oppsto en feil, kom tilbake senere", error);
     }
 }}
+// funksjon som gir riktig bakgrunnsfarge til type
+function setTypeColor(type) {
+    const colors = {
+    normal: "#ffe4e1",
+    fighting: "#800020",
+    flying: "#039fdb",
+    poison: "#ece0d1",
+    ground: "#be9b7b",
+    rock: "#a39193",
+    bug: "#87a96b",
+    ghost: "#dfe3ee",
+    steel: "#f7f7f7",
+    fire: "#ffad60",
+    water: "#9dafe4",
+    grass: "#78866b",
+    electric: "#f9d62e",
+    psycic: "#00dbdb",
+    ice: "#caeef9",
+    dragon: "#9ed670",
+    dark: "#123548",
+    fairy: "#ffffba"
+
+    };
+    return colors[type]
+}
 // lage og vise kort
 function showPokemonCard(pokemon) {
     const card = document.createElement('div');
     card.className = 'pokemon-card';
+
+    const pokemonType = pokemon.types[0].type.name;
+    const backgroundColor = setTypeColor(pokemonType);
+    card.style.backgroundColor = backgroundColor;
 
     const image = document.createElement('img');
     image.src = pokemon.sprites.front_default;
@@ -80,13 +109,19 @@ async function fetchAndDisplayPokemonTypes() {
         const typesContainer = document.getElementById("types-container");
 
         data.results.forEach(type => {
+            if (type.name !== "unknown" && type.name !== "shadow") {
             const button = document.createElement("button");
             button.textContent = type.name;
+            button.style.padding = "12px";
+            button.style.margin = "8px";
+            button.style.backgroundColor = "black"
+            button.style.color = "white";
+            button.style.borderRadius = "25px";
             button.addEventListener("click", () => filterPokemonsByType(type.name)); 
-            typesContainer.appendChild(button);
+            typesContainer.appendChild(button);}
         });
     } catch (error) {
-        console.error("Det oppstod en feil under henting av Pokémon-typer", error);
+        console.error("Det oppstod en feil, kom tilbake senere", error);
     }
 }
 
@@ -98,8 +133,13 @@ function filterPokemonsByType(selectedType) {
 
     pokemonCardsContainer.innerHTML = ''; 
     filteredPokemons.forEach(pokemon => showPokemonCard(pokemon));
+    hideBtns()
 } 
 // må ta bort typene "shadow" & "unknown" fra knappene da de ikke står i oppgaven, fikse det i morgen
+
+
+
+
 
 
 
