@@ -107,6 +107,10 @@ async function fetchAndDisplayPokemonTypes() {
         const data = await response.json();
         
         const typesContainer = document.getElementById("types-container");
+        const removeFilterBtn = document.createElement('button'); // style denne knappen hvis tid senere. lage egen funksjon for knappestylig? 
+        removeFilterBtn.textContent = "Fjern filter";
+        removeFilterBtn.addEventListener("click", removeFilter);
+        typesContainer.appendChild(removeFilterBtn);
 
         data.results.forEach(type => {
             if (type.name !== "unknown" && type.name !== "shadow") {
@@ -135,7 +139,10 @@ function filterPokemonsByType(selectedType) {
     filteredPokemons.forEach(pokemon => showPokemonCard(pokemon));
     hideBtns()
 } 
-// må ta bort typene "shadow" & "unknown" fra knappene da de ikke står i oppgaven, fikse det i morgen
+function removeFilter() {
+    pokemonCardsContainer.innerHTML = '';
+    fetchAndShowPokemons();
+}
 
 
 
