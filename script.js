@@ -151,8 +151,9 @@ function filterPokemonsByType(selectedType) {
   pokemonCardsContainer.innerHTML = "";
   const combinedPokemons = [...allPokemons, ...userCreatedPokemons];
   const filteredPokemons = combinedPokemons.filter(
-    (pokemon) => pokemon.types.some((type) => type.type.name === selectedType) // har fått hjelp her
+    (pokemon) => pokemon.types[0].type.name.toLowerCase() === selectedType.toLowerCase() // har fått hjelp her
   );
+  filteredPokemons.forEach((pokemon)=> showPokemonCard(pokemon));
 
   pokemonCardsContainer.innerHTML = "";
   filteredPokemons.forEach((pokemon) => showPokemonCard(pokemon));
