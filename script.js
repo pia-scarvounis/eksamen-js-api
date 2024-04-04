@@ -1,4 +1,15 @@
-// 1.1 liste ut 50 pokemonkort med navn, bilde og type:
+// local storage 
+let userCreatedPokemons =
+  JSON.parse(localStorage.getItem("userCreatedPokemons")) || [];
+
+function saveUserCreatedPokemonsInLs() {
+  localStorage.setItem(
+    "userCreatedPokemons",
+    JSON.stringify(userCreatedPokemons)
+  );
+}
+
+// liste ut 50 pokemonkort med navn, bilde og type:
 const pokemonCardsContainer = document.getElementById(
   "pokemon-cards-container"
 );
@@ -15,6 +26,11 @@ async function fetchPokemons() {
 }
 
 async function fetchAndShowPokemons() {
+  const savedUserCreatedPokemons = localStorage.getItem("userCreatedPokemons");
+  if (savedUserCreatedPokemons) {
+    userCreatedPokemons = JSON.parse(savedUserCreatedPokemons) || [];
+    userCreatedPokemons.forEach((pokemon) => showPokemonCard(pokemon));
+  }
   const pokemons = await fetchPokemons();
   allPokemons = [];
   for (let i = 0; i < pokemons.length; i++) {
@@ -29,6 +45,7 @@ async function fetchAndShowPokemons() {
     }
   }
 }
+
 // funksjon som gir riktig bakgrunnsfarge til type
 function setTypeColor(type) {
   const colors = {
@@ -53,6 +70,7 @@ function setTypeColor(type) {
   };
   return colors[type];
 }
+
 // lage og vise kort
 function showPokemonCard(pokemon) {
   const card = document.createElement("div");
@@ -66,7 +84,7 @@ function showPokemonCard(pokemon) {
   image.src = pokemon.sprites.front_default;
   image.className = "pokemon-image";
 
-  // legge til pokè-navn og (kun en) pokè-type:
+  // legge til poke-navn og (kun en) poke-type:
   const name = document.createElement("h2");
   name.textContent = pokemon.name;
   name.className = "pokemon-name";
@@ -79,7 +97,8 @@ function showPokemonCard(pokemon) {
 
   // legge til knapper på kort
   const btnContainer = document.createElement("div");
-  btnContainer.innerHTML = `<button class="edit-btn btn">Edit</button> <button class="delete-btn btn"> Delete</button> <button class="save-btn btn">Save</button>`;
+  btnContainer.innerHTML = `<button class="edit-btn btn">Edit</button
+  > <button class="delete-btn btn"> Delete</button> <button class="save-btn btn">Save</button>`;
 
   // appende bilde, navn, type, knapper til kort
   card.append(image, name, type, btnContainer);
@@ -92,7 +111,7 @@ fetchAndShowPokemons();
 // fetche / filtrere pokemontyper til knapper
 async function fetchAndDisplayPokemonTypes() {
   try {
-    const response = await fetch("https://pokeapi.co/api/v2/type");
+    const response = await fetch("https://pokeapi.co/api/v2/type"); // endre til limit18 senere hvis tid
     const data = await response.json();
 
     const typesContainer = document.getElementById("types-container");
@@ -109,6 +128,7 @@ async function fetchAndDisplayPokemonTypes() {
 
     data.results.forEach((type) => {
       if (type.name !== "unknown" && type.name !== "shadow") {
+        // endre til limit18 senere hvis tid
         const button = document.createElement("button");
         button.textContent = type.name;
         button.style.padding = "12px";
@@ -128,8 +148,10 @@ async function fetchAndDisplayPokemonTypes() {
 fetchAndDisplayPokemonTypes();
 
 function filterPokemonsByType(selectedType) {
-  const filteredPokemons = allPokemons.filter(
-    (pokemon) => pokemon.types[0].type.name === selectedType
+  pokemonCardsContainer.innerHTML = "";
+  const combinedPokemons = [...allPokemons, ...userCreatedPokemons];
+  const filteredPokemons = combinedPokemons.filter(
+    (pokemon) => pokemon.types.some((type) => type.type.name === selectedType) // har fått hjelp her
   );
 
   pokemonCardsContainer.innerHTML = "";
@@ -168,8 +190,8 @@ createYourOwnBtn.onclick = () => {
     types: [{ type: { name: createPokemonType } }],
     sprites: { front_default: defaultImageUrl },
   };
-
-  allPokemons.push(newPokemon);
+  userCreatedPokemons.push(newPokemon);
+  saveUserCreatedPokemonsInLs();
   showPokemonCard(newPokemon);
 };
 const image = document.createElement("img");
