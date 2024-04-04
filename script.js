@@ -49,7 +49,7 @@ function setTypeColor(type) {
     ice: "#caeef9",
     dragon: "#9ed670",
     dark: "#123548",
-    fairy: "#ffffba",
+    fairy: "#e3b5f3",
   };
   return colors[type];
 }
@@ -78,25 +78,11 @@ function showPokemonCard(pokemon) {
   type.className = "pokemon-type";
 
   // legge til knapper på kort
-  const editBtn = document.createElement("button");
-  editBtn.className = "edit-btn btn";
-  editBtn.textContent = "Edit";
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.className = "delete-btn btn";
-  deleteBtn.textContent = "Delete";
-
-  const saveBtn = document.createElement("button");
-  saveBtn.className = "save-btn btn";
-  saveBtn.textContent = "Save";
+  const btnContainer = document.createElement("div");
+  btnContainer.innerHTML = `<button class="edit-btn btn">Edit</button> <button class="delete-btn btn"> Delete</button> <button class="save-btn btn">Save</button>`;
 
   // appende bilde, navn, type, knapper til kort
-  card.appendChild(image);
-  card.appendChild(name);
-  card.appendChild(type);
-  card.appendChild(editBtn);
-  card.appendChild(deleteBtn);
-  card.appendChild(saveBtn);
+  card.append(image, name, type, btnContainer);
 
   // appende alle kort til nettsiden
   pokemonCardsContainer.appendChild(card);
@@ -110,11 +96,12 @@ async function fetchAndDisplayPokemonTypes() {
     const data = await response.json();
 
     const typesContainer = document.getElementById("types-container");
-    const removeFilterBtn = document.createElement("button"); 
-    removeFilterBtn.padding = "12px";
+    const removeFilterBtn = document.createElement("button");
+    removeFilterBtn.style.padding = "12px";
+    removeFilterBtn.style.letterSpacing = "1px";
     removeFilterBtn.style.margin = "4px";
-    removeFilterBtn.style.backgroundColor = "black";
-    removeFilterBtn.style.color = "white";
+    removeFilterBtn.style.backgroundColor = "white";
+    removeFilterBtn.style.color = "black";
     removeFilterBtn.style.borderRadius = "25px";
     removeFilterBtn.textContent = "Fjern filter";
     removeFilterBtn.addEventListener("click", removeFilter);
@@ -160,8 +147,14 @@ const createYourOwnContainer = document.getElementById(
 );
 createYourOwnContainer.style.backgroundColor = "pink";
 const createYourOwnBtn = document.getElementById("create-your-own-btn");
+createYourOwnBtn.style.padding = "12px";
+createYourOwnBtn.style.letterSpacing = "1px";
+createYourOwnBtn.style.margin = "4px";
+createYourOwnBtn.style.backgroundColor = "white";
+createYourOwnBtn.style.color = "black";
+createYourOwnBtn.style.borderRadius = "25px";
 createYourOwnBtn.onclick = () => {
-  let createPokemonName = prompt("Hva heter din pokemon?");
+  let createPokemonName = prompt("Men først! Hva skal din pokemon hete?");
   if (createPokemonName == "") {
     alert("Du må oppgi et navn!");
     return;
@@ -189,14 +182,12 @@ name.className = "pokemon-name";
 
 const type = document.createElement("p");
 if (pokemon.types.length > 0) {
-    const typeText = pokemon.types[0].type.name; 
-    type.textContent = `Type: ${typeText}`;
+  const typeText = pokemon.types[0].type.name;
+  type.textContent = `Type: ${typeText}`;
 }
 
 type.className = "pokemon-type";
 
-card.appendChild(image);
-card.appendChild(name);
-card.appendChild(type);
+card.append(image, name, type);
 
 pokemonCardsContainer.appendChild(card);
