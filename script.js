@@ -1,4 +1,4 @@
-// local storage 
+// local storage
 let userCreatedPokemons =
   JSON.parse(localStorage.getItem("userCreatedPokemons")) || [];
 
@@ -70,9 +70,14 @@ function setTypeColor(type) {
   };
   return colors[type];
 }
+// bruker saved favorites
+const savedFavoritesContainer = document.getElementById(
+  "saved-favorites-container"
+);
+
 
 // lage og vise kort
-function showPokemonCard(pokemon) {
+function showPokemonCard(pokemon, container = pokemonCardsContainer) { // fått hjelp med de siste parametere
   const card = document.createElement("div");
   card.className = "pokemon-card";
 
@@ -103,9 +108,20 @@ function showPokemonCard(pokemon) {
   // appende bilde, navn, type, knapper til kort
   card.append(image, name, type, btnContainer);
 
-  // appende alle kort til nettsiden
-  pokemonCardsContainer.appendChild(card);
+   //save btn - lagre til favoritter
+   const saveBtn = btnContainer.querySelector(".save-btn");
+   saveBtn.addEventListener("click", function() {saveToFavorites(pokemon);})
+
+  if (container === savedFavoritesContainer) {
+    saveBtn.style.display = "none"; 
+  }
+  container.appendChild(card);
 }
+
+function saveToFavorites(pokemon) {
+  showPokemonCard(pokemon, savedFavoritesContainer);
+}
+
 fetchAndShowPokemons();
 
 // fetche / filtrere pokemontyper til knapper
@@ -151,9 +167,10 @@ function filterPokemonsByType(selectedType) {
   pokemonCardsContainer.innerHTML = "";
   const combinedPokemons = [...allPokemons, ...userCreatedPokemons];
   const filteredPokemons = combinedPokemons.filter(
-    (pokemon) => pokemon.types[0].type.name.toLowerCase() === selectedType.toLowerCase() // har fått hjelp her
+    (pokemon) =>
+      pokemon.types[0].type.name.toLowerCase() === selectedType.toLowerCase() // har fått hjelp her
   );
-  filteredPokemons.forEach((pokemon)=> showPokemonCard(pokemon));
+  filteredPokemons.forEach((pokemon) => showPokemonCard(pokemon));
 
   pokemonCardsContainer.innerHTML = "";
   filteredPokemons.forEach((pokemon) => showPokemonCard(pokemon));
@@ -163,6 +180,7 @@ function removeFilter() {
   pokemonCardsContainer.innerHTML = "";
   fetchAndShowPokemons();
 }
+
 
 // bruker - lage egen pokemon
 const createYourOwnContainer = document.getElementById(
@@ -214,4 +232,6 @@ type.className = "pokemon-type";
 card.append(image, name, type);
 
 pokemonCardsContainer.appendChild(card);
+
+
 
