@@ -8,6 +8,21 @@ function saveUserCreatedPokemonsInLs() {
     JSON.stringify(userCreatedPokemons)
   );
 }
+function getSavedCards(){
+  return JSON.parse(localStorage.getItem("savedCards")) || [];
+}
+function saveToFavorites(pokemon) {
+  let savedCards = getSavedCards();
+
+  if (savedCards.length >= 5) {
+      alert("Det er fullt! Du må slette et Pokemon-kort for å legge til et nytt kort");
+      return; 
+    }
+      savedCards.push(pokemon);
+      localStorage.setItem('savedCards', JSON.stringify(savedCards));
+
+      showPokemonCard(pokemon, savedFavoritesContainer);
+     }
 
 // liste ut 50 pokemonkort med navn, bilde og type:
 const pokemonCardsContainer = document.getElementById(
@@ -118,10 +133,6 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) { // fått 
   container.appendChild(card);
 }
 
-function saveToFavorites(pokemon) {
-  showPokemonCard(pokemon, savedFavoritesContainer);
-}
-
 fetchAndShowPokemons();
 
 // fetche / filtrere pokemontyper til knapper
@@ -182,7 +193,7 @@ function removeFilter() {
 }
 
 
-// bruker - lage egen pokemon
+// bruker - lage egen pokemon på pokemonkort
 const createYourOwnContainer = document.getElementById(
   "create-your-own-container"
 );
