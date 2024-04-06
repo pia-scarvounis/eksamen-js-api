@@ -1,4 +1,4 @@
-// local storage
+// local storage : lagring av brukerlagde pokemons
 let userCreatedPokemons =
   JSON.parse(localStorage.getItem("userCreatedPokemons")) || [];
 
@@ -8,21 +8,23 @@ function saveUserCreatedPokemonsInLs() {
     JSON.stringify(userCreatedPokemons)
   );
 }
-function getSavedCards(){
+function getSavedCards() {
   return JSON.parse(localStorage.getItem("savedCards")) || [];
 }
 function saveToFavorites(pokemon) {
   let savedCards = getSavedCards();
 
   if (savedCards.length >= 5) {
-      alert("Det er fullt! Du må slette et Pokemon-kort for å legge til et nytt kort");
-      return; 
-    }
-      savedCards.push(pokemon);
-      localStorage.setItem('savedCards', JSON.stringify(savedCards));
+    alert(
+      "Det er fullt! Du må slette et Pokemon-kort for å legge til et nytt kort"
+    );
+    return;
+  }
+  savedCards.push(pokemon);
+  localStorage.setItem("savedCards", JSON.stringify(savedCards));
 
-      showPokemonCard(pokemon, savedFavoritesContainer);
-     }
+  showPokemonCard(pokemon, savedFavoritesContainer);
+}
 
 // liste ut 50 pokemonkort med navn, bilde og type:
 const pokemonCardsContainer = document.getElementById(
@@ -61,7 +63,7 @@ async function fetchAndShowPokemons() {
   }
 }
 
-// funksjon som gir riktig bakgrunnsfarge til type
+// funksjon som gir riktig bakgrunnsfarge til type:
 function setTypeColor(type) {
   const colors = {
     normal: "#ffe4e1",
@@ -85,14 +87,14 @@ function setTypeColor(type) {
   };
   return colors[type];
 }
-// bruker saved favorites
+// bruker saved favorites:
 const savedFavoritesContainer = document.getElementById(
   "saved-favorites-container"
 );
 
-
-// lage og vise kort
-function showPokemonCard(pokemon, container = pokemonCardsContainer) { // fått hjelp med de siste parametere
+// lage og vise kort:
+function showPokemonCard(pokemon, container = pokemonCardsContainer) {
+  // fått hjelp med de siste parametere
   const card = document.createElement("div");
   card.className = "pokemon-card";
 
@@ -115,30 +117,30 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) { // fått 
   }
   type.className = "pokemon-type";
 
-  // legge til knapper på kort
+  // legge til knapper på kort:
   const btnContainer = document.createElement("div");
   btnContainer.innerHTML = `<button class="edit-btn btn">Edit</button
   > <button class="delete-btn btn"> Delete</button> <button class="save-btn btn">Save</button>`;
 
-  // appende bilde, navn, type, knapper til kort
+  // appende bilde, navn, type, knapper til kort:
   card.append(image, name, type, btnContainer);
 
-   //save btn - lagre til favoritter
-   const saveBtn = btnContainer.querySelector(".save-btn");
-   saveBtn.addEventListener("click", function() {saveToFavorites(pokemon);})
+  // save btn - lagre til favoritter:
+  const saveBtn = btnContainer.querySelector(".save-btn");
+  saveBtn.addEventListener("click", function () {
+    saveToFavorites(pokemon);
+  });
 
   if (container === savedFavoritesContainer) {
-    saveBtn.style.display = "none"; 
+    saveBtn.style.display = "none";
   }
   container.appendChild(card);
   // delete btn - slette kort
-  
 }
-
 
 fetchAndShowPokemons();
 
-// fetche / filtrere pokemontyper til knapper
+// fetche / filtrere pokemontyper til knapper:
 async function fetchAndDisplayPokemonTypes() {
   try {
     const response = await fetch("https://pokeapi.co/api/v2/type"); // endre til limit18 senere hvis tid
@@ -159,6 +161,8 @@ async function fetchAndDisplayPokemonTypes() {
     data.results.forEach((type) => {
       if (type.name !== "unknown" && type.name !== "shadow") {
         // endre til limit18 senere hvis tid
+
+        // type buttons - styling:
         const button = document.createElement("button");
         button.textContent = type.name;
         button.style.padding = "12px";
@@ -176,30 +180,30 @@ async function fetchAndDisplayPokemonTypes() {
 }
 
 fetchAndDisplayPokemonTypes();
-
+// filtrerer pokemon basert på type:
 function filterPokemonsByType(selectedType) {
   pokemonCardsContainer.innerHTML = "";
   const combinedPokemons = [...allPokemons, ...userCreatedPokemons];
+  // filtrerer sammenslått liste basert på type:
   const filteredPokemons = combinedPokemons.filter(
     (pokemon) =>
       pokemon.types[0].type.name.toLowerCase() === selectedType.toLowerCase() // har fått hjelp her
-  );
+  ); // viser filtrerte pokemons
   filteredPokemons.forEach((pokemon) => showPokemonCard(pokemon));
 
   pokemonCardsContainer.innerHTML = "";
   filteredPokemons.forEach((pokemon) => showPokemonCard(pokemon));
   hideBtns();
-}
+} // fjerner filtreringen og viser alle pokemons:
 function removeFilter() {
   pokemonCardsContainer.innerHTML = "";
   fetchAndShowPokemons();
 }
 
-
-// bruker - lage egen pokemon på pokemonkort
+// bruker - lage egen pokemon på pokemonkort:
 const createYourOwnContainer = document.getElementById(
   "create-your-own-container"
-);
+); // create your own container & knapp+styling:
 createYourOwnContainer.style.backgroundColor = "pink";
 const createYourOwnBtn = document.getElementById("create-your-own-btn");
 createYourOwnBtn.style.padding = "12px";
@@ -208,22 +212,24 @@ createYourOwnBtn.style.margin = "4px";
 createYourOwnBtn.style.backgroundColor = "white";
 createYourOwnBtn.style.color = "black";
 createYourOwnBtn.style.borderRadius = "25px";
+// add navn til pokemon:
 createYourOwnBtn.onclick = () => {
   let createPokemonName = prompt("Men først! Hva skal din pokemon hete?");
   if (createPokemonName == "") {
     alert("Du må oppgi et navn!");
     return;
-  }
+  } // dropdown meny - velge pokemontype:
   const typeSelect = document.getElementById("typeSelect");
-  let createPokemonType = typeSelect.value;
+  let createPokemonType = typeSelect.value; // valgt type
   const defaultImageUrl = "assets/user.png";
-
+  // brukers nye pokemon-objekt m type & bilde:
   const newPokemon = {
     name: createPokemonName,
     types: [{ type: { name: createPokemonType } }],
     sprites: { front_default: defaultImageUrl },
-  };
+  }; // nyoppretta pokemons legges til brukerlagde pokemons:
   userCreatedPokemons.push(newPokemon);
+  // vises i local storage og på siden:
   saveUserCreatedPokemonsInLs();
   showPokemonCard(newPokemon);
 };
@@ -246,6 +252,3 @@ type.className = "pokemon-type";
 card.append(image, name, type);
 
 pokemonCardsContainer.appendChild(card);
-
-
-
