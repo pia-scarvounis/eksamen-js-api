@@ -10,7 +10,14 @@
     <div id="pikachu-stats-container"></div>
     <div id="charmander-stats-container"></div>
     <div id="squirtle-stats-container"></div>
+    <img id="pokeball" src="/assets/pokeball.webp" alt="pokeball"> 
+    <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa">
     <script>
+        // pokeball åpnes når den trykkes på 
+        let closedPokeball = document.getElementById("pokeball");
+        closedPokeball.addEventListener("click", function(){
+            closedPokeball.src = "/assets/open-pokeball.jpg";
+        })
  // https://pokeapi.co/api/v2/stats
  // pikachu id:25 Charmander id: 4 Squirtle: id: 7
     </script>

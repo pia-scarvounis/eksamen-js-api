@@ -3,3 +3,24 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+#santa-img {
+width: 350px;
+height: 350px;
+position: fixed;
+right: 75px;
+bottom: 25px;
+transform: transform 0,5s ease;
+}
+
+#pokeball {
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    left: 280px;
+    bottom: 30px;
+    transform: transform 0,5s ease;
+}
+#pokeball:hover {
+    transform: translateY(-40px); 
+}
