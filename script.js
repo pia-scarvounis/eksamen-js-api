@@ -131,7 +131,10 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) { // fått 
     saveBtn.style.display = "none"; 
   }
   container.appendChild(card);
+  // delete btn - slette kort
+  
 }
+
 
 fetchAndShowPokemons();
 
