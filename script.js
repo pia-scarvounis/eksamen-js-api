@@ -8,6 +8,7 @@ function saveUserCreatedPokemonsInLs() {
     JSON.stringify(userCreatedPokemons)
   );
 }
+// local storage / bruker saved favorites:
 function getSavedCards() {
   return JSON.parse(localStorage.getItem("savedCards")) || [];
 }
@@ -25,6 +26,16 @@ function saveToFavorites(pokemon) {
 
   showPokemonCard(pokemon, savedFavoritesContainer);
 }
+const savedFavoritesContainer = document.getElementById(
+  "saved-favorites-container"
+);
+function displaySavedCards() {
+  const savedCards = getSavedCards();
+  savedCards.forEach(pokemon => {
+    showPokemonCard(pokemon, savedFavoritesContainer);
+  });
+}
+document.addEventListener('DOMContentLoaded', displaySavedCards);
 
 // liste ut 50 pokemonkort med navn, bilde og type:
 const pokemonCardsContainer = document.getElementById(
@@ -87,10 +98,6 @@ function setTypeColor(type) {
   };
   return colors[type];
 }
-// bruker saved favorites:
-const savedFavoritesContainer = document.getElementById(
-  "saved-favorites-container"
-);
 
 // lage og vise kort:
 function showPokemonCard(pokemon, container = pokemonCardsContainer) {
@@ -229,6 +236,7 @@ createYourOwnBtn.onclick = () => {
     sprites: { front_default: defaultImageUrl },
   }; // nyoppretta pokemons legges til brukerlagde pokemons:
   userCreatedPokemons.push(newPokemon);
+  
   // vises i local storage og på siden:
   saveUserCreatedPokemonsInLs();
   showPokemonCard(newPokemon);
