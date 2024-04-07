@@ -129,15 +129,22 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) {// fått h
   btnContainer.innerHTML = `<button class="edit-btn btn">Edit</button
   > <button class="delete-btn btn"> Delete</button> <button class="save-btn btn">Save</button>`;
 
-  // appende bilde, navn, type, knapper til kort:
-  card.append(image, name, type, btnContainer);
-  
   // delete btn - slette kort:
   const deleteBtn = btnContainer.querySelector(".delete-btn");
   deleteBtn.addEventListener("click", function() {
+    console.log("Før sletting:", JSON.parse(localStorage.getItem("savedCards")));
  
     card.remove();
-  });
+  
+  let savedCards = JSON.parse(localStorage.getItem("savedCards")) || [];
+  savedCards = savedCards.filter(savedCard => savedCard.name !== pokemon.name);
+  localStorage.setItem("savedCards", JSON.stringify(savedCards));
+  console.log("Etter sletting:", savedCards);
+});
+
+  // appende bilde, navn, type, knapper til kort:
+  card.append(image, name, type, btnContainer);
+  
 
   // save btn - lagre til favoritter:
   const saveBtn = btnContainer.querySelector(".save-btn");
