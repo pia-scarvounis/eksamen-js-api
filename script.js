@@ -31,11 +31,12 @@ const savedFavoritesContainer = document.getElementById(
 );
 function displaySavedCards() {
   const savedCards = getSavedCards();
-  savedCards.forEach(pokemon => {
+  savedCards.forEach((pokemon) => {
     showPokemonCard(pokemon, savedFavoritesContainer);
   });
 }
-document.addEventListener('DOMContentLoaded', displaySavedCards);
+document.addEventListener("DOMContentLoaded", displaySavedCards);
+
 
 // liste ut 50 pokemonkort med navn, bilde og type:
 const pokemonCardsContainer = document.getElementById(
@@ -100,8 +101,7 @@ function setTypeColor(type) {
 }
 
 // lage og vise kort:
-function showPokemonCard(pokemon, container = pokemonCardsContainer) {
-  // fått hjelp med de siste parametere
+function showPokemonCard(pokemon, container = pokemonCardsContainer) {// fått hjelp med de siste parametere
   const card = document.createElement("div");
   card.className = "pokemon-card";
 
@@ -131,6 +131,13 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) {
 
   // appende bilde, navn, type, knapper til kort:
   card.append(image, name, type, btnContainer);
+  
+  // delete btn - slette kort:
+  const deleteBtn = btnContainer.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", function() {
+ 
+    card.remove();
+  });
 
   // save btn - lagre til favoritter:
   const saveBtn = btnContainer.querySelector(".save-btn");
@@ -142,7 +149,6 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) {
     saveBtn.style.display = "none";
   }
   container.appendChild(card);
-  // delete btn - slette kort
 }
 
 fetchAndShowPokemons();
@@ -169,7 +175,7 @@ async function fetchAndDisplayPokemonTypes() {
       if (type.name !== "unknown" && type.name !== "shadow") {
         // endre til limit18 senere hvis tid
 
-        // type buttons - styling:
+        // type-buttons - styling:
         const button = document.createElement("button");
         button.textContent = type.name;
         button.style.padding = "12px";
@@ -190,7 +196,7 @@ fetchAndDisplayPokemonTypes();
 // filtrerer pokemon basert på type:
 function filterPokemonsByType(selectedType) {
   pokemonCardsContainer.innerHTML = "";
-  const combinedPokemons = [...allPokemons, ...userCreatedPokemons];
+  const combinedPokemons = [...allPokemons, ...userCreatedPokemons]; // anders metode
   // filtrerer sammenslått liste basert på type:
   const filteredPokemons = combinedPokemons.filter(
     (pokemon) =>
@@ -236,19 +242,20 @@ createYourOwnBtn.onclick = () => {
     sprites: { front_default: defaultImageUrl },
   }; // nyoppretta pokemons legges til brukerlagde pokemons:
   userCreatedPokemons.push(newPokemon);
-  
+
   // vises i local storage og på siden:
   saveUserCreatedPokemonsInLs();
   showPokemonCard(newPokemon);
 };
+// bilde fra API
 const image = document.createElement("img");
 image.src = pokemon.sprites.front_default;
 image.className = "pokemon-image";
-
+// navn fra API
 const name = document.createElement("h2");
 name.textContent = pokemon.name;
 name.className = "pokemon-name";
-
+// type fra API
 const type = document.createElement("p");
 if (pokemon.types.length > 0) {
   const typeText = pokemon.types[0].type.name;
