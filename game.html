@@ -1,25 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pokemon-game</title>
-    <link rel="stylesheet" href="/game.css">
-</head>
-<body>
-    <div id="pikachu-stats-container"></div>
-    <div id="charmander-stats-container"></div>
-    <div id="squirtle-stats-container"></div>
-    <img id="pokeball" src="/assets/pokeball.webp" alt="pokeball"> 
-    <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa">
+    <link rel="stylesheet" href="/game.css" />
+  </head>
+  <body>
+    <!-- container pokemon stats -->
+    <div id="stats-container" style="display: none"></div>
+    <!-- bilder fra assets-->
+    <img id="pokeball" src="/assets/pokeball.png" alt="pokeball" />
+    <img id="pokemon-img" src="" alt="pokemon" style="display: none" />
+    <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa" />
     <script>
-        // pokeball åpnes når den trykkes på 
-        let closedPokeball = document.getElementById("pokeball");
-        closedPokeball.addEventListener("click", function(){
-            closedPokeball.src = "/assets/open-pokeball.jpg";
-        })
- // https://pokeapi.co/api/v2/stats
- // pikachu id:25 Charmander id: 4 Squirtle: id: 7
+      // til senere
+      const pokemonImg = document.getElementById("pokemon-img");
+      const statsContainer = document.getElementById("stats-container");
+      // async function, fetch data fra API basert på ID.
+      async function fetchPokemonStats(id) {
+        const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
+        const response = await fetch(url);
+        const pokemonData = await response.json();
+        return pokemonData;
+      }
+      // vise stat i container + styling
+      async function displayPokemonStats(pokemonData) {
+        statsContainer.innerHTML = "";
+        statsContainer.style.display = "block";
+        statsContainer.style.backgroundColor = "white";
+        statsContainer.style.width = "200px";
+        statsContainer.style.margin = "20px";
+        statsContainer.style.padding = "30px";
+        // inne i stats container
+        const nameElement = document.createElement("h3");
+        nameElement.textContent =
+          pokemonData.name.charAt(0).toUpperCase() +
+          pokemonData.name.slice(1).toLowerCase();
+        // lage og legge til elementer for navn, HP, angrep og forsvar
+        const hpElement = document.createElement("p");
+        hpElement.textContent = "HP: " + pokemonData.stats[0].base_stat;
+        const attackElement = document.createElement("p");
+        attackElement.textContent = "Attack: " + pokemonData.stats[1].base_stat;
+        const defenseElement = document.createElement("p");
+        defenseElement.textContent =
+          "Defense: " + pokemonData.stats[2].base_stat;
+
+        statsContainer.appendChild(nameElement);
+        statsContainer.appendChild(hpElement);
+        statsContainer.appendChild(attackElement);
+        statsContainer.appendChild(defenseElement);
+      }
+      // pokemons-array med 3 pokemon
+      const pokemons = [
+        {
+          id: 25,
+          img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+        }, // pikachu
+        {
+          id: 4,
+          img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+        }, // charmander
+        {
+          id: 7,
+          img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+        }, // squirtle
+      ];
+
+      // pokeball åpnes når den trykkes på
+      let closedPokeball = document.getElementById("pokeball");
+      closedPokeball.addEventListener("click", async function () {
+        closedPokeball.src = "/assets/open-pokeball.jpg";
+        const randomIndex = Math.floor(Math.random() * pokemons.length);
+        const selectedPokemon = pokemons[randomIndex];
+
+        pokemonImg.src = selectedPokemon.img;
+        pokemonImg.style.display = "block";
+        const pokemonData = await fetchPokemonStats(selectedPokemon.id);
+        displayPokemonStats(pokemonData);
+      });
     </script>
-</body>
+  </body>
 </html>
