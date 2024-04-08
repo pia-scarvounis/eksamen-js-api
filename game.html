@@ -25,7 +25,7 @@
         return pokemonData;
       }
       // vise stat i container + styling
-      async function displayPokemonStats(pokemonData) {
+      async function displayPokemonStats(pokemonData)
         statsContainer.innerHTML = "";
         statsContainer.style.display = "block";
         statsContainer.style.backgroundColor = "white";
@@ -50,7 +50,7 @@
         statsContainer.appendChild(hpElement);
         statsContainer.appendChild(attackElement);
         statsContainer.appendChild(defenseElement);
-      }
+      
       // pokemons-array med 3 pokemon
       const pokemons = [
         {
