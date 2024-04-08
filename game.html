@@ -7,39 +7,44 @@
     <link rel="stylesheet" href="/game.css" />
   </head>
   <body>
-    <!-- container pokemon stats -->
+    <!-- container pokemon -->
     <div id="stats-container" style="display: none"></div>
+    <!--bad santa stats container-->
+    <div id="santa-stats-container"></div>
     <!-- bilder fra assets-->
     <img id="pokeball" src="/assets/pokeball.png" alt="pokeball" />
     <img id="pokemon-img" src="" alt="pokemon" style="display: none" />
     <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa" />
+
     <script>
       // til senere
       const pokemonImg = document.getElementById("pokemon-img");
       const statsContainer = document.getElementById("stats-container");
+      const santaStatsContainer = document.getElementById(
+        "santa-stats-container"
+      );
       // async function, fetch data fra API basert på ID.
       async function fetchPokemonStats(id) {
         try {
-        const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
-        const response = await fetch(url);
-        const pokemonData = await response.json();
-        const imgUrl = pokemonData.sprites.other["official-artwork"].front_default;
-      return {
-        name: pokemonData.name,
-      image: imgUrl,
-      stats: pokemonData.stats 
-      
-      };
-    
-      } catch (error) {
-        console.error("noe er feil, kom tilbake senere", error);
-        return null; 
+          const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
+          const response = await fetch(url);
+          const pokemonData = await response.json();
+          const imgUrl =
+            pokemonData.sprites.other["official-artwork"].front_default;
+          return {
+            name: pokemonData.name,
+            image: imgUrl,
+            stats: pokemonData.stats,
+          };
+        } catch (error) {
+          console.error("noe er feil, kom tilbake senere", error);
+          return null;
+        }
       }
-    };
       // vise stat i container + styling
       async function displayPokemonStats(pokemonData) {
         pokemonImg.src = pokemonData.image;
-  pokemonImg.style.display = "block";
+        pokemonImg.style.display = "block";
         statsContainer.innerHTML = "";
         statsContainer.style.display = "block";
         statsContainer.style.backgroundColor = "white";
@@ -47,6 +52,8 @@
         statsContainer.style.margin = "20px";
         statsContainer.style.padding = "30px";
         statsContainer.style.borderRadius = "20px";
+        statsContainer.style.fontFamily = "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif";
+
         // inne i stats container
         const nameElement = document.createElement("h3");
         nameElement.textContent =
@@ -92,6 +99,49 @@
         const pokemonData = await fetchPokemonStats(selectedPokemon.id);
         pokemonImg.style.display = "block";
         displayPokemonStats(pokemonData);
+      });
+
+      // bad santa
+      const badSantaStats = {
+        name: "Bad Santa",
+        hp: 50,
+        attack: 50,
+        defense: 50,
+      };
+
+      function displayBadSantaStats() {
+        santaStatsContainer.innerHTML = "";
+        santaStatsContainer.style.display = "block";
+        santaStatsContainer.style.backgroundColor = "white";
+        santaStatsContainer.style.width = "200px";
+        santaStatsContainer.style.margin = "20px";
+        santaStatsContainer.style.padding = "30px";
+        santaStatsContainer.style.borderRadius = "20px";
+        santaStatsContainer.style.fontFamily = "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif";
+
+        // nisse navn
+        const badSantasName = document.createElement("h3");
+        badSantasName.textContent = badSantaStats.name;
+        // nisse HP
+        const badSantasHp = document.createElement("p");
+        badSantasHp.textContent = "HP:" + badSantaStats.hp;
+        // nisse attack
+        const badSantasAttack = document.createElement("p");
+        badSantasAttack.textContent = "Attack:" + badSantaStats.attack;
+        // nisse defense
+        const badSantasDefense = document.createElement("p");
+        badSantasDefense.textContent = "Defense:" + badSantaStats.defense;
+
+        santaStatsContainer.append(
+          badSantasName,
+          badSantasHp,
+          badSantasAttack,
+          badSantasDefense
+        );
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        displayBadSantaStats();
+        console.log("Viser Bad Santa stats");
       });
     </script>
   </body>

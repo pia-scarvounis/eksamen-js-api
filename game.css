@@ -5,12 +5,15 @@ body {
 }
 
 #santa-img {
-width: 350px;
-height: 350px;
+width: 380px;
+height: 380px;
 position: fixed;
 right: 75px;
-bottom: 25px;
-transform: transform 0,5s ease;
+bottom: 35px;
+transition: transform 0.5s ease;
+}
+#santa-img:hover {
+    transform: translateY(-20px); 
 }
 
 #pokeball {
@@ -19,7 +22,7 @@ transform: transform 0,5s ease;
     position: absolute;
     left: 280px;
     bottom: 30px;
-    transform: transform 0,5s ease;
+    transition: transform 0.5s ease;
 }
 #pokeball:hover {
     transform: translateY(-20px); 
@@ -28,8 +31,11 @@ transform: transform 0,5s ease;
     width: 350px;
     height: auto; 
     position: absolute;
-    left: 380px; 
-    bottom: 140px; 
+    left: 390px; 
+    bottom: 130px; 
     display: none;
- 
+    transition: transform 0.5s ease;
+}
+#pokemon-img:hover {
+    transform: translateY(-20px); 
 }
