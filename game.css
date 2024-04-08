@@ -22,14 +22,14 @@ transform: transform 0,5s ease;
     transform: transform 0,5s ease;
 }
 #pokeball:hover {
-    transform: translateY(-10px); 
+    transform: translateY(-20px); 
 }
 #pokemon-img {
-    width: 400px;
+    width: 350px;
     height: auto; 
     position: absolute;
-    left: 400px; 
-    bottom: 20px; 
+    left: 380px; 
+    bottom: 140px; 
     display: none;
  
 }

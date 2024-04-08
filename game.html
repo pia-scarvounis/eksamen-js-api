@@ -19,19 +19,34 @@
       const statsContainer = document.getElementById("stats-container");
       // async function, fetch data fra API basert på ID.
       async function fetchPokemonStats(id) {
+        try {
         const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
         const response = await fetch(url);
         const pokemonData = await response.json();
-        return pokemonData;
+        const imgUrl = pokemonData.sprites.other["official-artwork"].front_default;
+      return {
+        name: pokemonData.name,
+      image: imgUrl,
+      stats: pokemonData.stats 
+      
+      };
+    
+      } catch (error) {
+        console.error("noe er feil, kom tilbake senere", error);
+        return null; 
       }
+    };
       // vise stat i container + styling
-      async function displayPokemonStats(pokemonData)
+      async function displayPokemonStats(pokemonData) {
+        pokemonImg.src = pokemonData.image;
+  pokemonImg.style.display = "block";
         statsContainer.innerHTML = "";
         statsContainer.style.display = "block";
         statsContainer.style.backgroundColor = "white";
         statsContainer.style.width = "200px";
         statsContainer.style.margin = "20px";
         statsContainer.style.padding = "30px";
+        statsContainer.style.borderRadius = "20px";
         // inne i stats container
         const nameElement = document.createElement("h3");
         nameElement.textContent =
@@ -50,7 +65,7 @@
         statsContainer.appendChild(hpElement);
         statsContainer.appendChild(attackElement);
         statsContainer.appendChild(defenseElement);
-      
+      }
       // pokemons-array med 3 pokemon
       const pokemons = [
         {
@@ -74,9 +89,8 @@
         const randomIndex = Math.floor(Math.random() * pokemons.length);
         const selectedPokemon = pokemons[randomIndex];
 
-        pokemonImg.src = selectedPokemon.img;
-        pokemonImg.style.display = "block";
         const pokemonData = await fetchPokemonStats(selectedPokemon.id);
+        pokemonImg.style.display = "block";
         displayPokemonStats(pokemonData);
       });
     </script>
