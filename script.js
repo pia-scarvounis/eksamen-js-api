@@ -42,6 +42,8 @@ document.addEventListener("DOMContentLoaded", displaySavedCards);
 const pokemonCardsContainer = document.getElementById(
   "pokemon-cards-container"
 );
+pokemonCardsContainer.style.backgroundColor = "#e5f1e7";
+pokemonCardsContainer.style.margin = "30px";
 
 // fetching pokemon-api, try & catch:
 let allPokemons;
@@ -132,14 +134,12 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) {// fått h
   // delete btn - slette kort:
   const deleteBtn = btnContainer.querySelector(".delete-btn");
   deleteBtn.addEventListener("click", function() {
-    console.log("Før sletting:", JSON.parse(localStorage.getItem("savedCards")));
  
     card.remove();
   
   let savedCards = JSON.parse(localStorage.getItem("savedCards")) || [];
   savedCards = savedCards.filter(savedCard => savedCard.name !== pokemon.name);
   localStorage.setItem("savedCards", JSON.stringify(savedCards));
-  console.log("Etter sletting:", savedCards);
 });
 
   // appende bilde, navn, type, knapper til kort:
@@ -225,10 +225,15 @@ const createYourOwnContainer = document.getElementById(
   "create-your-own-container"
 ); // create your own container & knapp+styling:
 createYourOwnContainer.style.backgroundColor = "pink";
+createYourOwnContainer.style.width = "500px";
+createYourOwnContainer.style.height = "180px";
+createYourOwnContainer.style.padding = "10px";
+createYourOwnContainer.style.margin = "30px";
+createYourOwnContainer.style.borderRadius = "15px";
 const createYourOwnBtn = document.getElementById("create-your-own-btn");
 createYourOwnBtn.style.padding = "12px";
 createYourOwnBtn.style.letterSpacing = "1px";
-createYourOwnBtn.style.margin = "4px";
+createYourOwnBtn.style.margin = "40px";
 createYourOwnBtn.style.backgroundColor = "white";
 createYourOwnBtn.style.color = "black";
 createYourOwnBtn.style.borderRadius = "25px";
@@ -274,3 +279,7 @@ type.className = "pokemon-type";
 card.append(image, name, type);
 
 pokemonCardsContainer.appendChild(card);
+
+
+
+

@@ -54,5 +54,9 @@ button:hover, .remove-filter-btn:hover {
     cursor: pointer; 
     
 }
+button:active, .remove-filter-btn:active {
+    opacity: 0.2 ease;
+    transform: scale(0.95);
+}
 
 
