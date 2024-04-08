@@ -16,7 +16,7 @@ function saveToFavorites(pokemon) {
   let savedCards = getSavedCards();
 
   if (savedCards.length >= 5) {
-    alert(
+    alert( 
       "Det er fullt! Du må slette et Pokemon-kort for å legge til et nytt kort"
     );
     return;
@@ -130,6 +130,18 @@ function showPokemonCard(pokemon, container = pokemonCardsContainer) {// fått h
   const btnContainer = document.createElement("div");
   btnContainer.innerHTML = `<button class="edit-btn btn">Edit</button
   > <button class="delete-btn btn"> Delete</button> <button class="save-btn btn">Save</button>`;
+
+  // Edit btn - redigere kort:
+  const editBtn = btnContainer.querySelector(".edit-btn");
+  editBtn.addEventListener("click", function() {
+    const newName = prompt("Nytt navn:", name.textContent);
+    const newType = prompt("Ny type:", type.textContent.replace('Type: ', '')); // har fått hjelp her 
+    if (newName && newType) {
+      name.textContent = newName;
+      type.textContent = `Type: ${newType}`;
+      card.style.backgroundColor = setTypeColor(newType.toLowerCase());
+    }
+  });
 
   // delete btn - slette kort:
   const deleteBtn = btnContainer.querySelector(".delete-btn");
