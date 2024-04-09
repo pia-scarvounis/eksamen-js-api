@@ -93,19 +93,12 @@
 
         // pokemon angrep funksjon:
         function pokemonAttack() {
-          alert(`${currentPokemonData.name} har angrepet Bad Santa!`);
+          alert(`${currentPokemonData.name} har angrepet Bad Santa med!${currentPokemonData.weapon}`);
           return;
         } // og
 
         //event listener
         pokemonImg.addEventListener("click", pokemonAttack);
-        {
-          if (selectedPokemon) {
-            alert("Ingen Pokemon er valgt!");
-            return;
-          }
-          alert(`${currentPokemonData.name} har angrepet Bad Santa!`);
-        }
       }
 
       // pokemons-array med 3 pokemon
@@ -113,14 +106,17 @@
         {
           id: 25,
           img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+          weapon: "elektrisitet",
         }, // pikachu
         {
           id: 4,
           img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+          weapon: "ild",
         }, // charmander
         {
           id: 7,
           img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+          weapon: "vann"
         }, // squirtle
       ];
 
