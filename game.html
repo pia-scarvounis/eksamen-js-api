@@ -7,11 +7,18 @@
     <link rel="stylesheet" href="/game.css" />
   </head>
   <body>
-    <div class="game-description"><h2>Bekjemp Bad Santa</h2>
-        Trykk på pokemonballen og få hjelp av din pokemon-venn! <br>
-            &#9889; <strong>Pikachu attack:</strong> elektristet<br>
-            &#129370;<strong>Squirtle attack:</strong> egg<br>
-            &#128293;<strong>Charmander attack: </strong> ild</p><br>
+    <div class="game-description">
+      <h2>Bekjemp Bad Santa</h2>
+      <p>
+        Trykk på pokemonballen og få hjelp av en tilfeldig pokemon-venn! Trykk
+        deretter på din tilfeldige pokemon-venn for angrep av Bad Santa<br />
+      </p>
+      <p>
+        &#128166;<strong>Squirtle attack:</strong> vann<br />
+        &#9889; <strong>Pikachu attack:</strong> elektrisitet<br />
+        &#128293;<strong>Charmander attack: </strong> ild
+      </p>
+      <br />
     </div>
     <!-- container pokemon -->
     <div id="stats-container" style="display: none"></div>
@@ -23,7 +30,10 @@
     <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa" />
 
     <script>
-      // til senere
+      // global variabel for valgt pokemon
+      let currentPokemonData = null;
+
+      // pokemonbilde & statscontainers hentes inn
       const pokemonImg = document.getElementById("pokemon-img");
       const statsContainer = document.getElementById("stats-container");
       const santaStatsContainer = document.getElementById(
@@ -47,10 +57,11 @@
           return null;
         }
       }
-      // vise stat i container + styling
+      // vise stats i container + styling
       async function displayPokemonStats(pokemonData) {
+        currentPokemonData = pokemonData;
         pokemonImg.src = pokemonData.image;
-        pokemonImg.style.display = "block";
+        pokemonImg.style.display = "inline-block";
         statsContainer.innerHTML = "";
         statsContainer.style.display = "block";
         statsContainer.style.backgroundColor = "white";
@@ -58,7 +69,8 @@
         statsContainer.style.margin = "20px";
         statsContainer.style.padding = "30px";
         statsContainer.style.borderRadius = "20px";
-        statsContainer.style.fontFamily = "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif";
+        statsContainer.style.fontFamily =
+          "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif";
 
         // inne i stats container
         const nameElement = document.createElement("h3");
@@ -78,7 +90,24 @@
         statsContainer.appendChild(hpElement);
         statsContainer.appendChild(attackElement);
         statsContainer.appendChild(defenseElement);
+
+        // pokemon angrep funksjon:
+        function pokemonAttack() {
+          alert(`${currentPokemonData.name} har angrepet Bad Santa!`);
+          return;
+        } // og
+
+        //event listener
+        pokemonImg.addEventListener("click", pokemonAttack);
+        {
+          if (selectedPokemon) {
+            alert("Ingen Pokemon er valgt!");
+            return;
+          }
+          alert(`${currentPokemonData.name} har angrepet Bad Santa!`);
+        }
       }
+
       // pokemons-array med 3 pokemon
       const pokemons = [
         {
@@ -123,7 +152,8 @@
         santaStatsContainer.style.margin = "20px";
         santaStatsContainer.style.padding = "30px";
         santaStatsContainer.style.borderRadius = "20px";
-        santaStatsContainer.style.fontFamily = "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif";
+        santaStatsContainer.style.fontFamily =
+          "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif";
 
         // nisse navn
         const badSantasName = document.createElement("h3");
@@ -147,7 +177,6 @@
       }
       document.addEventListener("DOMContentLoaded", function () {
         displayBadSantaStats();
-        console.log("Viser Bad Santa stats");
       });
     </script>
   </body>
