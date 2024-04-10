@@ -11,7 +11,7 @@
       <h2>Bekjemp Bad Santa</h2>
       <p>
         Trykk på pokemonballen og få hjelp av en tilfeldig pokemon-venn! Trykk
-        deretter på din tilfeldige pokemon-venn for angrep av Bad Santa<br />
+        deretter på din tilfeldige pokemon-venn for å angripe Bad Santa<br />
       </p>
       <p>
         &#128166;<strong>Squirtle attack:</strong> vann<br />
@@ -93,7 +93,7 @@
 
         // pokemon angrep funksjon:
         function pokemonAttack() {
-          alert(`${currentPokemonData.name} har angrepet Bad Santa med!${currentPokemonData.weapon}`);
+          alert(`${currentPokemonData.name} har angrepet Bad Santa med ${currentPokemonData.weapon}!`);
           return;
         } // og
 
@@ -128,9 +128,12 @@
         const selectedPokemon = pokemons[randomIndex];
 
         const pokemonData = await fetchPokemonStats(selectedPokemon.id);
-        pokemonImg.style.display = "block";
-        displayPokemonStats(pokemonData);
-      });
+        currentPokemonData = {
+        ...pokemonData, 
+        weapon: selectedPokemon.weapon
+      };
+      pokemonImg.style.display = "block";
+        displayPokemonStats(currentPokemonData);});
 
       // bad santa
       const badSantaStats = {
