@@ -43,9 +43,16 @@ transition: transform 0.5s ease;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     text-align: left;
     background-color: #F7E6B2;
-    width: 350px;
-    padding: 15px;
+    width: 380px;
+    padding: 10px;
    margin: 10px;
     border-radius: 10px;
     line-height: 25px;
 }
+#attack-effect {
+    display: none;
+    position: absolute;
+    top: 100px; 
+    right: 30px;
+    z-index: 10;
+  }

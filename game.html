@@ -29,6 +29,11 @@
     <img id="pokemon-img" src="" alt="pokemon" style="display: none" />
     <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa" />
 
+    <!--bilder av angreps-effekter: vann, lyn, ild-->
+    <div id="attack-effect" style="display: none; position: absolute; z-index: 10;">
+        <img id="attack-image" src="">
+    </div>
+
     <script>
       // global variabel for valgt pokemon
       let currentPokemonData = null;
@@ -62,6 +67,7 @@
         currentPokemonData = pokemonData;
         pokemonImg.src = pokemonData.image;
         pokemonImg.style.display = "inline-block";
+        pokemonImg.onclick = pokemonAttack;
         statsContainer.innerHTML = "";
         statsContainer.style.display = "block";
         statsContainer.style.backgroundColor = "white";
@@ -93,13 +99,30 @@
 
         // pokemon angrep funksjon:
         function pokemonAttack() {
-          alert(`${currentPokemonData.name} har angrepet Bad Santa med ${currentPokemonData.weapon}!`);
-          return;
-        } // og
+            let attackImageUrl = '';
+            if (currentPokemonData.name.toLowerCase() === "pikachu") {
+        attackImageUrl = '/assets/lyn-attack.png'; // lyn
+    } else if (currentPokemonData.name.toLowerCase() === "charmander") {
+        attackImageUrl = '/assets/fire-attack.png'; // ild
+    } else if (currentPokemonData.name.toLowerCase() === "squirtle") {
+        attackImageUrl = '/assets/water-attack.png'; // vann
+    }
+     // attack img vises:
+     const attackEffectContainer = document.getElementById("attack-effect");
+    const attackImage = document.getElementById("attack-image");
+    attackImage.src = attackImageUrl;
+    attackImage.style.width = "400px"; 
+attackImage.style.height = "auto"; 
+    attackEffectContainer.style.display = 'block';
 
-        //event listener
-        pokemonImg.addEventListener("click", pokemonAttack);
-      }
+    // alert melding
+          alert(`${currentPokemonData.name} angriper Bad Santa med ${currentPokemonData.weapon}!`);
+          
+        setTimeout(function() {
+        attackEffectContainer.style.display = 'none';
+    }, 2000); 
+    
+}}
 
       // pokemons-array med 3 pokemon
       const pokemons = [
