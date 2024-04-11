@@ -30,8 +30,11 @@
     <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa" />
 
     <!--bilder av angreps-effekter: vann, lyn, ild-->
-    <div id="attack-effect" style="display: none; position: absolute; z-index: 10;">
-        <img id="attack-image" src="">
+    <div
+      id="attack-effect"
+      style="display: none; position: absolute; z-index: 10"
+    >
+      <img id="attack-image" src="" />
     </div>
 
     <script>
@@ -85,12 +88,12 @@
           pokemonData.name.slice(1).toLowerCase();
         // lage og legge til elementer for navn, HP, angrep og forsvar
         const hpElement = document.createElement("p");
-        hpElement.textContent = "HP: " + pokemonData.stats[0].base_stat;
+        hpElement.textContent = "HP: " + Math.floor(pokemonData.stats[0].base_stat);
         const attackElement = document.createElement("p");
-        attackElement.textContent = "Attack: " + pokemonData.stats[1].base_stat;
+        attackElement.textContent = "Attack: " + Math.floor(pokemonData.stats[1].base_stat);
         const defenseElement = document.createElement("p");
         defenseElement.textContent =
-          "Defense: " + pokemonData.stats[2].base_stat;
+          "Defense: " + Math.floor(pokemonData.stats[2].base_stat);
 
         statsContainer.appendChild(nameElement);
         statsContainer.appendChild(hpElement);
@@ -99,30 +102,62 @@
 
         // pokemon angrep funksjon:
         function pokemonAttack() {
-            let attackImageUrl = '';
-            if (currentPokemonData.name.toLowerCase() === "pikachu") {
-        attackImageUrl = '/assets/lyn-attack.png'; // lyn
-    } else if (currentPokemonData.name.toLowerCase() === "charmander") {
-        attackImageUrl = '/assets/fire-attack.png'; // ild
-    } else if (currentPokemonData.name.toLowerCase() === "squirtle") {
-        attackImageUrl = '/assets/water-attack.png'; // vann
-    }
-     // attack img vises:
-     const attackEffectContainer = document.getElementById("attack-effect");
-    const attackImage = document.getElementById("attack-image");
-    attackImage.src = attackImageUrl;
-    attackImage.style.width = "400px"; 
-attackImage.style.height = "auto"; 
-    attackEffectContainer.style.display = 'block';
+          let attackImageUrl = "";
+          if (currentPokemonData.name.toLowerCase() === "pikachu") {
+            attackImageUrl = "/assets/lyn-attack.png"; // lyn
+          } else if (currentPokemonData.name.toLowerCase() === "charmander") {
+            attackImageUrl = "/assets/fire-attack.png"; // ild
+          } else if (currentPokemonData.name.toLowerCase() === "squirtle") {
+            attackImageUrl = "/assets/water-attack.png"; // vann
+          }
+          // attack img vises:
+          const attackEffectContainer =
+            document.getElementById("attack-effect");
+          const attackImage = document.getElementById("attack-image");
+          attackImage.src = attackImageUrl;
+          attackImage.style.width = "400px";
+          attackImage.style.height = "auto";
+          attackEffectContainer.style.display = "block";
 
-    // alert melding
-          alert(`${currentPokemonData.name} angriper Bad Santa med ${currentPokemonData.weapon}!`);
-          
-        setTimeout(function() {
-        attackEffectContainer.style.display = 'none';
-    }, 2000); 
-    
-}}
+          let attackDamage = 10;
+          badSantaStats.hp -= attackDamage;
+          displayBadSantaStats();
+          if (gameOver()) return;
+          setTimeout(badSantaAttack, 2000);
+
+          // alert melding
+          alert(
+            `${currentPokemonData.name.charAt(0).toUpperCase() + currentPokemonData.name.slice(1).toLowerCase()} angriper Bad Santa med ${currentPokemonData.weapon}!`
+          );
+
+          setTimeout(function () {
+            attackEffectContainer.style.display = "none";
+          }, 2000);
+        }
+
+        function badSantaAttack() {
+          let attackDamage = Math.floor(Math.random() * 10) +5;
+          let defenseEffect = currentPokemonData.stats[2].base_stat / 100;
+          attackDamage -= attackDamage * defenseEffect; // forsvar reduserer skade, fått hjelp til denne let´en
+
+          // random kommentarer fra bad santa
+          const comments = [
+            "Hva var de puslegreiene der, Pokemon? Pass opp!",
+            "Ikke undervurder Bad Santa!",
+            "Er det alt du har?",
+            "Bow chika wow wow pang, det der kjente jeg ikke en gang, Pokemon!",
+            "ikke kødd meg meg, Pokemon!",
+          ];
+          let randomComment =
+            comments[Math.floor(Math.random() * comments.length)];
+
+          alert(`Bad Santa angriper tilbake! ${randomComment}`);
+          // Oppdaterer Pokémonens HP
+          currentPokemonData.stats[0].base_stat -= attackDamage;
+          displayPokemonStats(currentPokemonData);
+          if(gameOver()) return;
+        }
+      }
 
       // pokemons-array med 3 pokemon
       const pokemons = [
@@ -139,7 +174,7 @@ attackImage.style.height = "auto";
         {
           id: 7,
           img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
-          weapon: "vann"
+          weapon: "vann",
         }, // squirtle
       ];
 
@@ -152,11 +187,12 @@ attackImage.style.height = "auto";
 
         const pokemonData = await fetchPokemonStats(selectedPokemon.id);
         currentPokemonData = {
-        ...pokemonData, 
-        weapon: selectedPokemon.weapon
-      };
-      pokemonImg.style.display = "block";
-        displayPokemonStats(currentPokemonData);});
+          ...pokemonData,
+          weapon: selectedPokemon.weapon,
+        };
+        pokemonImg.style.display = "block";
+        displayPokemonStats(currentPokemonData);
+      });
 
       // bad santa
       const badSantaStats = {
@@ -182,13 +218,13 @@ attackImage.style.height = "auto";
         badSantasName.textContent = badSantaStats.name;
         // nisse HP
         const badSantasHp = document.createElement("p");
-        badSantasHp.textContent = "HP:" + badSantaStats.hp;
+        badSantasHp.textContent = "HP:" + Math.floor(badSantaStats.hp);
         // nisse attack
         const badSantasAttack = document.createElement("p");
-        badSantasAttack.textContent = "Attack:" + badSantaStats.attack;
+        badSantasAttack.textContent = "Attack:" + Math.floor(badSantaStats.attack);
         // nisse defense
         const badSantasDefense = document.createElement("p");
-        badSantasDefense.textContent = "Defense:" + badSantaStats.defense;
+        badSantasDefense.textContent = "Defense:" + Math.floor(badSantaStats.defense);
 
         santaStatsContainer.append(
           badSantasName,
@@ -200,6 +236,21 @@ attackImage.style.height = "auto";
       document.addEventListener("DOMContentLoaded", function () {
         displayBadSantaStats();
       });
+
+       // game over
+       console.log(currentPokemonData);
+      function gameOver() {
+    if (currentPokemonData.stats[0].base_stat <= 0) {
+        alert("Bad Santa vinner! Spillet er over.");
+        pokemonImg.onclick = null;
+        return true; 
+    } else if (badSantaStats.hp <= 0) {
+        alert(currentPokemonData.name.charAt(0).toUpperCase() + currentPokemonData.name.slice(1) + " vinner! Spillet er over.");
+        pokemonImg.onclick = null;
+        return true; 
+    }
+    return false; 
+}
     </script>
   </body>
 </html>
