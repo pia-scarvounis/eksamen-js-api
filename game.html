@@ -88,9 +88,11 @@
           pokemonData.name.slice(1).toLowerCase();
         // lage og legge til elementer for navn, HP, angrep og forsvar
         const hpElement = document.createElement("p");
-        hpElement.textContent = "HP: " + Math.floor(pokemonData.stats[0].base_stat);
+        hpElement.textContent =
+          "HP: " + Math.floor(pokemonData.stats[0].base_stat);
         const attackElement = document.createElement("p");
-        attackElement.textContent = "Attack: " + Math.floor(pokemonData.stats[1].base_stat);
+        attackElement.textContent =
+          "Attack: " + Math.floor(pokemonData.stats[1].base_stat);
         const defenseElement = document.createElement("p");
         defenseElement.textContent =
           "Defense: " + Math.floor(pokemonData.stats[2].base_stat);
@@ -120,14 +122,27 @@
           attackEffectContainer.style.display = "block";
 
           let attackDamage = 10;
-          badSantaStats.hp -= attackDamage;
+          if (badSantaStats.hp - attackDamage < 0) {
+            badSantaStats.hp = 0;
+          } else {
+            badSantaStats.hp -= attackDamage;
+          }
+          // attack stat:
+          if (currentPokemonData.stats[1].base_stat > 5) {
+        currentPokemonData.stats[1].base_stat -= 5;
+    } else {
+        currentPokemonData.stats[1].base_stat = 0;
+    }
           displayBadSantaStats();
           if (gameOver()) return;
           setTimeout(badSantaAttack, 2000);
 
           // alert melding
           alert(
-            `${currentPokemonData.name.charAt(0).toUpperCase() + currentPokemonData.name.slice(1).toLowerCase()} angriper Bad Santa med ${currentPokemonData.weapon}!`
+            `${
+              currentPokemonData.name.charAt(0).toUpperCase() +
+              currentPokemonData.name.slice(1).toLowerCase()
+            } angriper Bad Santa med ${currentPokemonData.weapon}!`
           );
 
           setTimeout(function () {
@@ -136,9 +151,7 @@
         }
 
         function badSantaAttack() {
-          let attackDamage = Math.floor(Math.random() * 10) +5;
-          let defenseEffect = currentPokemonData.stats[2].base_stat / 100;
-          attackDamage -= attackDamage * defenseEffect; // forsvar reduserer skade, fått hjelp til denne let´en
+          let attackDamage = Math.floor(Math.random() * 20) + 1;
 
           // random kommentarer fra bad santa
           const comments = [
@@ -152,11 +165,22 @@
             comments[Math.floor(Math.random() * comments.length)];
 
           alert(`Bad Santa angriper tilbake! ${randomComment}`);
-          // Oppdaterer Pokémonens HP
-          currentPokemonData.stats[0].base_stat -= attackDamage;
+
+          if (currentPokemonData.stats[0].base_stat - attackDamage < 0) {
+            currentPokemonData.stats[0].base_stat = 0;
+          } else {
+            currentPokemonData.stats[0].base_stat -= attackDamage;
+          }
           displayPokemonStats(currentPokemonData);
-          if(gameOver()) return;
+          if (gameOver()) return;
         }
+
+        // attack stat:
+        if (badSantaStats.attack > 5) {
+        badSantaStats.attack -= 5;
+    } else {
+        badSantaStats.attack = 0;
+    }
       }
 
       // pokemons-array med 3 pokemon
@@ -221,10 +245,12 @@
         badSantasHp.textContent = "HP:" + Math.floor(badSantaStats.hp);
         // nisse attack
         const badSantasAttack = document.createElement("p");
-        badSantasAttack.textContent = "Attack:" + Math.floor(badSantaStats.attack);
+        badSantasAttack.textContent =
+          "Attack:" + Math.floor(badSantaStats.attack);
         // nisse defense
         const badSantasDefense = document.createElement("p");
-        badSantasDefense.textContent = "Defense:" + Math.floor(badSantaStats.defense);
+        badSantasDefense.textContent =
+          "Defense:" + Math.floor(badSantaStats.defense);
 
         santaStatsContainer.append(
           badSantasName,
@@ -237,20 +263,23 @@
         displayBadSantaStats();
       });
 
-       // game over
-       console.log(currentPokemonData);
+      // game over
       function gameOver() {
-    if (currentPokemonData.stats[0].base_stat <= 0) {
-        alert("Bad Santa vinner! Spillet er over.");
-        pokemonImg.onclick = null;
-        return true; 
-    } else if (badSantaStats.hp <= 0) {
-        alert(currentPokemonData.name.charAt(0).toUpperCase() + currentPokemonData.name.slice(1) + " vinner! Spillet er over.");
-        pokemonImg.onclick = null;
-        return true; 
-    }
-    return false; 
-}
+        if (currentPokemonData.stats[0].base_stat <= 0) {
+          alert("Bad Santa vinner! Spillet er over.");
+          pokemonImg.onclick = null;
+          return true;
+        } else if (badSantaStats.hp <= 0) {
+          alert(
+            currentPokemonData.name.charAt(0).toUpperCase() +
+              currentPokemonData.name.slice(1) +
+              " vinner! Spillet er over."
+          );
+          pokemonImg.onclick = null;
+          return true;
+        }
+        return false;
+      }
     </script>
   </body>
 </html>
