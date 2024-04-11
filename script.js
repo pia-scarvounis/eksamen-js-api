@@ -15,6 +15,14 @@ function getSavedCards() {
 function saveToFavorites(pokemon) {
   let savedCards = getSavedCards();
 
+  // sjekke om kort er lagret i fav
+  const isAlreadySaved = savedCards.map(card => card.name).includes(pokemon.name);
+
+  if (isAlreadySaved) {
+    alert("Du har allerede lagret denne Pokemonen!");
+    return; 
+  }
+// sjekke om favoritter er fullt 
   if (savedCards.length >= 5) {
     alert( 
       "Det er fullt! Du må slette et Pokemon-kort for å legge til et nytt kort"
@@ -29,6 +37,7 @@ function saveToFavorites(pokemon) {
 const savedFavoritesContainer = document.getElementById(
   "saved-favorites-container"
 );
+// displaySavedCards funksjon
 function displaySavedCards() {
   const savedCards = getSavedCards();
   savedCards.forEach((pokemon) => {
