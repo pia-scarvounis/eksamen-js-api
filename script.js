@@ -184,7 +184,7 @@ fetchAndShowPokemons();
 // fetche / filtrere pokemontyper til knapper:
 async function fetchAndDisplayPokemonTypes() {
   try {
-    const response = await fetch("https://pokeapi.co/api/v2/type"); // endre til limit18 senere hvis tid
+    const response = await fetch("https://pokeapi.co/api/v2/type"); 
     const data = await response.json();
 
     const typesContainer = document.getElementById("types-container");

@@ -43,9 +43,9 @@ transition: transform 0.5s ease;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     text-align: left;
     background-color: #F7E6B2;
-    width: 380px;
-    padding: 10px;
-   margin: 10px;
+    width: 370px;
+    padding: 8px;
+   margin: 8px;
     border-radius: 10px;
     line-height: 25px;
 }
@@ -56,3 +56,5 @@ transition: transform 0.5s ease;
     right: 30px;
     z-index: 10;
   }
+
+ 

@@ -85,6 +85,7 @@
         nameElement.textContent =
           pokemonData.name.charAt(0).toUpperCase() +
           pokemonData.name.slice(1).toLowerCase();
+
         // lage og legge til elementer for navn, HP, angrep og forsvar
         const hpElement = document.createElement("p");
         hpElement.textContent =
@@ -154,10 +155,10 @@
 
           // random kommentarer fra bad santa
           const comments = [
-            "Hva var de puslegreiene der, Pokemon? Pass opp!",
+            "Hva var de puslegreiene der, Pokemon?",
             "Ikke undervurder Bad Santa!",
             "Er det alt du har?",
-            "Bow chika wow wow pang, det der kjente jeg ikke en gang, Pokemon!",
+            "Det der kjente jeg ikke en gang, Pokemon!",
             "ikke kødd meg meg, Pokemon!",
           ];
           let randomComment =
@@ -268,11 +269,6 @@
           alert("Bad Santa vinner! Spillet er over.");
           pokemonImg.style.display = "none";
           pokemonImg.onclick = null;
-          window.confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-        });
           return true;
         } else if (badSantaStats.hp <= 0) {
           alert(
