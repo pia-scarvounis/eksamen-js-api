@@ -10,14 +10,14 @@
     <div class="game-description">
       <h2>Bekjemp Bad Santa</h2>
       <p>
-        Trykk på pokemonballen og få hjelp av en tilfeldig pokemon-venn! Trykk
-        deretter på din tilfeldige pokemon-venn for å angripe Bad Santa<br />
+        Trykk på pokemonballen og få hjelp av en tilfeldig pokemon-venn! 
       </p>
       <p>
         &#128166;<strong>Squirtle attack:</strong> vann<br />
         &#9889; <strong>Pikachu attack:</strong> elektrisitet<br />
         &#128293;<strong>Charmander attack: </strong> ild
       </p>
+      <p><em>*defense fungerer kun når pokemon sloss mot pokemon</em></p>
       <br />
     </div>
     <!-- container pokemon -->
@@ -36,7 +36,6 @@
     >
       <img id="attack-image" src="" />
     </div>
-
     <script>
       // global variabel for valgt pokemon
       let currentPokemonData = null;
@@ -151,7 +150,7 @@
         }
 
         function badSantaAttack() {
-          let attackDamage = Math.floor(Math.random() * 20) + 1;
+          let attackDamage = Math.floor(Math.random() * 15) + 1;
 
           // random kommentarer fra bad santa
           const comments = [
@@ -267,7 +266,13 @@
       function gameOver() {
         if (currentPokemonData.stats[0].base_stat <= 0) {
           alert("Bad Santa vinner! Spillet er over.");
+          pokemonImg.style.display = "none";
           pokemonImg.onclick = null;
+          window.confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
           return true;
         } else if (badSantaStats.hp <= 0) {
           alert(
@@ -275,11 +280,12 @@
               currentPokemonData.name.slice(1) +
               " vinner! Spillet er over."
           );
-          pokemonImg.onclick = null;
+          document.getElementById("santa-img").style.display = "none";
           return true;
         }
         return false;
       }
+  
     </script>
   </body>
 </html>
