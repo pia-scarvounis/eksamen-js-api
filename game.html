@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Pokemon Game</title>
+  <link rel="stylesheet" href="/game.css" />
+</head>
+<body>
+  <!-- Rules / How to play -->
+  <div class="rules-card">
+    <h3>How to play</h3>
+    <ul>
+      <li>Click the Poké Ball to summon a random Pokémon.</li>
+      <li><strong>Attack</strong>: Hit Bad Santa. (Space key also attacks.)</li>
+      <li><strong>Defend</strong>: Halves Santa’s next damage to you.</li>
+      <li><strong>Heal</strong>: Restore some HP (2 uses per battle).</li>
+      <li>After your turn, Santa will telegraph, then counter-attack.</li>
+    </ul>
+  </div>
+
+  <!-- Stats (HUD) -->
+  <div class="hud">
+    <div id="stats-container" class="card hidden"></div>
+    <div id="santa-stats-container" class="card"></div>
+  </div>
+
+  <!-- Arena / Characters -->
+  <img id="pokeball" src="/assets/pokeball.png" alt="pokeball" />
+  <img id="pokemon-img" src="" alt="pokemon" />
+  <img id="santa-img" src="/assets/santa-claus.png" alt="bad santa" />
+
+  <!-- Speech bubble -->
+  <div id="bubble" class="bubble" aria-live="polite"></div>
+
+  <!-- Confetti -->
+  <canvas id="confetti" class="hidden"></canvas>
+
+  <!-- Result overlay -->
+  <div
+    id="result-overlay"
+    class="overlay hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="result-title"
+  >
+    <div class="modal">
+      <h1 id="result-title"></h1>
+      <p id="result-sub"></p>
+      <img id="result-img" class="result-img" src="" alt="result" />
+      <button id="btn-restart" class="btn">Play again</button>
+    </div>
+  </div>
+
+  <!-- Sounds -->
+  <audio id="snd-attack" src="/assets/sfx_attack.mp3" preload="auto"></audio>
+  <audio id="snd-win" src="/assets/sfx_win.mp3" preload="auto"></audio>
+  <audio id="snd-lose" src="/assets/sfx_lose.mp3" preload="auto"></audio>
+
+  <p class="hint">Hint: Space = Attack. Choose Defend/Heal for strategy.</p>
+
+  <!-- Action bar -->
+  <div class="action-bar hidden" id="action-bar">
+    <button class="action-btn" id="btn-attack" title="Attack (Space)">Attack ⚔️</button>
+    <button class="action-btn" id="btn-defend" title="Halve Santa’s next hit">Defend 🛡️</button>
+    <button class="action-btn" id="btn-heal" title="Restore HP (2 uses)">Heal ❤️ (2)</button>
+  </div>
+
+  <script>
+    /* ===============================
+       Game state & element handles
+    ================================*/
+    let currentPokemon = null;
+    let inputLocked = false;
+
+    const pokemonImg = document.getElementById("pokemon-img");
+    const pokeball = document.getElementById("pokeball");
+    const statsContainer = document.getElementById("stats-container");
+    const santaStatsContainer = document.getElementById("santa-stats-container");
+    const bubble = document.getElementById("bubble");
+
+    const confettiCanvas = document.getElementById("confetti");
+    const ctx = confettiCanvas.getContext("2d");
+
+    const SND_ATTACK = document.getElementById("snd-attack");
+    const SND_WIN = document.getElementById("snd-win");
+    const SND_LOSE = document.getElementById("snd-lose");
+
+    const resultOverlay = document.getElementById("result-overlay");
+    const resultTitle = document.getElementById("result-title");
+    const resultSub = document.getElementById("result-sub");
+    const resultImg = document.getElementById("result-img");
+    const btnRestart = document.getElementById("btn-restart");
+
+    // Action buttons
+    const actionBar = document.getElementById("action-bar");
+    const btnAttack = document.getElementById("btn-attack");
+    const btnDefend = document.getElementById("btn-defend");
+    const btnHeal = document.getElementById("btn-heal");
+
+    const pokemons = [
+      { id: 25, name: "pikachu",   weapon: "electricity", effect: "/assets/lyn-attack.png" },
+      { id: 4,  name: "charmander", weapon: "fire",       effect: "/assets/fire-attack.png" },
+      { id: 7,  name: "squirtle",   weapon: "water",      effect: "/assets/water-attack.png" },
+    ];
+
+    // --- Stronger Santa baseline ---
+    let badSanta = { name: "Bad Santa", hp: 140, attack: 32, defense: 22, maxHp: 140 };
+
+    // ---- Balance knobs ----
+    const BALANCE = {
+      playerMult: 0.92,  // slightly lower player damage
+      santaMult: 1.12,   // slightly higher Santa damage
+    };
+
+    // Player tactical state
+    const playerState = {
+      defendActive: false,
+      healsLeft: 2
+    };
+
+    // Santa gets a random resist per battle (one of the 3 types)
+    let santaResist = null;
+
+    /* ===============================
+       Helpers
+    ================================*/
+    function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
+
+    async function fetchPokemonStats(id) {
+      try {
+        const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const imgUrl = data.sprites.other["official-artwork"].front_default;
+        return {
+          name: data.name,
+          image: imgUrl,
+          hp: data.stats[0].base_stat,
+          attack: data.stats[1].base_stat,
+          defense: data.stats[2].base_stat,
+        };
+      } catch (err) {
+        console.error("Something went wrong fetching Pokémon data:", err);
+        return null;
+      }
+    }
+
+    function hpBar(percent) {
+      const wrap = document.createElement("div");
+      wrap.className = "hpbar";
+      const fill = document.createElement("div");
+      fill.className = "fill";
+      fill.style.width = `${percent}%`;
+      if (percent <= 25) fill.classList.add("low");
+      else if (percent <= 60) fill.classList.add("mid");
+      wrap.appendChild(fill);
+      return wrap;
+    }
+
+    function renderPokemonStats() {
+      if (!currentPokemon) return;
+      statsContainer.innerHTML = "";
+      statsContainer.classList.remove("hidden");
+
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = cap(currentPokemon.name);
+
+      const hpNow = Math.max(currentPokemon.hp, 0);
+      const hp = document.createElement("div");
+      hp.className = "statline";
+      hp.textContent = `HP: ${hpNow}`;
+      const bar = hpBar(Math.max(0, Math.min(100, (hpNow / currentPokemon.maxHp) * 100)));
+
+      const atk = document.createElement("div");
+      atk.className = "statline";
+      atk.textContent = `Attack: ${Math.floor(currentPokemon.attack)}`;
+
+      const def = document.createElement("div");
+      def.className = "statline";
+      def.textContent = `Defense: ${Math.floor(currentPokemon.defense)}`;
+
+      statsContainer.append(name, hp, bar, atk, def);
+    }
+
+    function renderSantaStats() {
+      santaStatsContainer.innerHTML = "";
+
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = badSanta.name;
+
+      const hpNow = Math.max(badSanta.hp, 0);
+      const hp = document.createElement("div");
+      hp.className = "statline";
+      hp.textContent = `HP: ${hpNow}`;
+      const bar = hpBar(Math.max(0, Math.min(100, (hpNow / badSanta.maxHp) * 100)));
+
+      const atk = document.createElement("div");
+      atk.className = "statline";
+      atk.textContent = `Attack: ${Math.floor(badSanta.attack)}`;
+
+      const def = document.createElement("div");
+      def.className = "statline";
+      def.textContent = `Defense: ${Math.floor(badSanta.defense)}`;
+
+      santaStatsContainer.append(name, hp, bar, atk, def);
+    }
+
+    // ---- Bubble: let CSS control the position ----
+    function showBubble(text) {
+      bubble.textContent = text;
+      bubble.style.display = "block"; // no JS positioning; CSS decides
+    }
+
+    // Generic projectile: fromEl -> toEl, call onHit() on impact
+    function showAttackEffect(url, fromEl, toEl, onHit) {
+      const img = document.createElement("img");
+      img.src = url;
+      img.style.position = "absolute";
+      img.style.width = "200px";
+      img.style.height = "auto";
+      img.style.pointerEvents = "none";
+      img.style.zIndex = 1000;
+      document.body.appendChild(img);
+
+      const a = fromEl.getBoundingClientRect();
+      const b = toEl.getBoundingClientRect();
+      const startX = a.left + a.width / 2;
+      const startY = a.top + a.height / 2;
+      const endX = b.left + b.width / 2;
+      const endY = b.top + b.height / 2;
+
+      const duration = 600; // ms
+      const start = performance.now();
+
+      function animate(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const x = startX + (endX - startX) * t;
+        const y = startY + (endY - startY) * t;
+        img.style.left = x - img.width / 2 + "px";
+        img.style.top  = y - img.height / 2 + "px";
+
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          document.body.removeChild(img);
+          if (typeof onHit === "function") onHit();
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // Light confetti
+    let flakes = [];
+    function launchConfetti(ms = 2500) {
+      confettiCanvas.classList.remove("hidden");
+      confettiCanvas.width = innerWidth;
+      confettiCanvas.height = innerHeight;
+      flakes = Array.from({ length: 160 }).map(() => ({
+        x: Math.random() * confettiCanvas.width,
+        y: -20 - Math.random() * confettiCanvas.height,
+        r: 4 + Math.random() * 6,
+        vx: -2 + Math.random() * 4,
+        vy: 2 + Math.random() * 4,
+      }));
+      const start = performance.now();
+      function tick(t) {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        flakes.forEach(f => {
+          f.x += f.vx; f.y += f.vy; f.vy += 0.02;
+          ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2); ctx.fill();
+        });
+        if (t - start < ms) requestAnimationFrame(tick);
+        else confettiCanvas.classList.add("hidden");
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function showResult(win, message) {
+      resultTitle.textContent = win ? "You win!" : "Bad Santa wins!";
+      resultSub.textContent = message;
+      resultImg.src = win ? "/assets/trophy.png" : "/assets/sad-santa.png";
+      resultOverlay.classList.remove("hidden");
+      if (win) { SND_WIN.currentTime = 0; SND_WIN.play(); launchConfetti(); }
+      else { SND_LOSE.currentTime = 0; SND_LOSE.play(); }
+    }
+
+    btnRestart.addEventListener("click", resetGame);
+
+    /* ===============================
+       Combat logic
+    ================================*/
+    function typeMod(p) {
+      // keep very small per-pokemon variance
+      if (p.name === "pikachu") return 1.03;
+      if (p.name === "charmander") return 1.00;
+      if (p.name === "squirtle") return 1.00;
+      return 1.0;
+    }
+
+    // steadier damage, less swingy
+    function rollDamage(att, def, mult = 1) {
+      let base = 8 + att * 0.22 - def * 0.15;   // slightly milder scaling
+      base = Math.max(5, Math.min(16, base));
+      const rand = (Math.random() * 3.5) - 1.75; // -1.75..+1.75
+      const crit = Math.random() < 0.10 ? 1.6 : 1; // 10% crit
+      return Math.round((base + rand) * crit * mult);
+    }
+
+    function checkGameOver() {
+      if (currentPokemon && currentPokemon.hp <= 0) {
+        pokemonImg.style.display = "none";
+        showResult(false, "Try again! Maybe pick another Pokémon?");
+        setActionsEnabled(false);
+        return true;
+      }
+      if (badSanta.hp <= 0) {
+        document.getElementById("santa-img").style.display = "none";
+        showResult(true, `${cap(currentPokemon.name)} saved the holidays!`);
+        setActionsEnabled(false);
+        return true;
+      }
+      return false;
+    }
+
+    // Telegraph (pulse + countdown) before Santa attacks
+    function telegraphSantaAttack(ms = 1400, steps = 3) {
+      const santaEl = document.getElementById("santa-img");
+      santaEl.classList.add("santa-telegraph");
+
+      let left = steps;
+      showBubble(`${badSanta.name} is preparing an attack... ${left}`);
+      const tick = setInterval(() => {
+        left--;
+        if (left > 0) showBubble(`${badSanta.name} is preparing an attack... ${left}`);
+      }, ms / steps);
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          clearInterval(tick);
+          santaEl.classList.remove("santa-telegraph");
+          resolve();
+        }, ms);
+      });
+    }
+
+    // --- Player actions ---
+    async function playerAttack() {
+      if (inputLocked || !currentPokemon) return;
+      inputLocked = true; setActionsEnabled(false);
+
+      // Projectile from Pokémon -> Santa, apply damage on hit
+      const santaEl = document.getElementById("santa-img");
+      SND_ATTACK.currentTime = 0; SND_ATTACK.play();
+      showAttackEffect(currentPokemon.effect, pokemonImg, santaEl, () => {
+        // resist check
+        const resistMult = (santaResist === currentPokemon.weapon) ? 0.70 : 1.0;
+        const dmg = rollDamage(
+          currentPokemon.attack,
+          badSanta.defense,
+          typeMod(currentPokemon) * BALANCE.playerMult * resistMult
+        );
+        badSanta.hp = Math.max(0, badSanta.hp - dmg);
+        renderSantaStats();
+
+        // Santa hit shake
+        santaEl.classList.add("santa-hit");
+        setTimeout(() => santaEl.classList.remove("santa-hit"), 400);
+
+        const resistNote = (resistMult < 1) ? " (resisted)" : "";
+        showBubble(`${cap(currentPokemon.name)} hits for ${dmg}${resistNote}! ${badSanta.name} has ${badSanta.hp} HP left.`);
+        if (checkGameOver()) return;
+
+        // Santa's turn
+        santaTurn();
+      });
+    }
+
+    async function playerDefend() {
+      if (inputLocked || !currentPokemon) return;
+      inputLocked = true; setActionsEnabled(false);
+
+      playerState.defendActive = true;
+      pokemonImg.classList.add("defend-glow");
+      showBubble(`${cap(currentPokemon.name)} raises a shield! Santa's next hit will be halved.`);
+
+      // Santa's turn
+      santaTurn();
+    }
+
+    async function playerHeal() {
+      if (inputLocked || !currentPokemon) return;
+      if (playerState.healsLeft <= 0) { showBubble("No heals left!"); return; }
+
+      inputLocked = true; setActionsEnabled(false);
+      const healAmt = Math.floor(14 + Math.random() * 10); // 14–23 HP
+      currentPokemon.hp = Math.min(currentPokemon.maxHp, currentPokemon.hp + healAmt);
+      playerState.healsLeft -= 1;
+      btnHeal.textContent = `Heal ❤️ (${playerState.healsLeft})`;
+      renderPokemonStats();
+
+      showBubble(`${cap(currentPokemon.name)} heals ${healAmt} HP! Now at ${currentPokemon.hp}/${currentPokemon.maxHp}.`);
+
+      // Santa's turn
+      santaTurn();
+    }
+
+    // Santa's attack turn (telegraph -> projectile -> apply damage)
+    function santaTurn() {
+      const santaEl = document.getElementById("santa-img");
+
+      telegraphSantaAttack(1200, 3).then(() => {
+        const gifts = ["/assets/attackimg1.png", "/assets/attackimg2.png", "/assets/attackimg3.png"];
+        const gift = gifts[Math.floor(Math.random() * gifts.length)];
+
+        showAttackEffect(gift, santaEl, pokemonImg, () => {
+          // small miss chance
+          if (Math.random() < 0.06) {
+            showBubble(`${badSanta.name} missed! ${cap(currentPokemon.name)} stays at ${currentPokemon.hp} HP.`);
+            if (!checkGameOver()) { inputLocked = false; setActionsEnabled(true); }
+            return;
+          }
+
+          const raw = rollDamage(badSanta.attack, currentPokemon.defense, BALANCE.santaMult);
+          const reduced = playerState.defendActive ? Math.max(1, Math.round(raw * 0.5)) : raw;
+
+          currentPokemon.hp = Math.max(0, currentPokemon.hp - reduced);
+
+          // Pokémon shake on hit
+          pokemonImg.classList.add("pokemon-hit");
+          setTimeout(() => pokemonImg.classList.remove("pokemon-hit"), 400);
+
+          // Disable defend after it triggers
+          let defendMsg = "";
+          if (playerState.defendActive) {
+            playerState.defendActive = false;
+            pokemonImg.classList.remove("defend-glow");
+            defendMsg = ` (defended: ${raw}→${reduced})`;
+          }
+
+          renderPokemonStats();
+          showBubble(`${badSanta.name} strikes for ${reduced}!${defendMsg} ${cap(currentPokemon.name)} has ${currentPokemon.hp} HP left.`);
+          if (!checkGameOver()) {
+            inputLocked = false; setActionsEnabled(true);
+          }
+        });
+      });
+    }
+
+    /* ===============================
+       Start / reset
+    ================================*/
+    function setActionsEnabled(enabled) {
+      btnAttack.disabled = !enabled;
+      btnDefend.disabled = !enabled;
+      btnHeal.disabled   = !enabled;
+    }
+
+    function attachHandlers() {
+      // Keep click on Pokémon as Attack for convenience
+      pokemonImg.onclick = playerAttack;
+      btnAttack.onclick = playerAttack;
+      btnDefend.onclick = playerDefend;
+      btnHeal.onclick = playerHeal;
+    }
+
+    function detachHandlers() {
+      pokemonImg.onclick = null;
+      btnAttack.onclick = null;
+      btnDefend.onclick = null;
+      btnHeal.onclick = null;
+    }
+
+    function resetGame() {
+      // UI
+      resultOverlay.classList.add("hidden");
+      confettiCanvas.classList.add("hidden");
+      document.getElementById("santa-img").style.display = "block";
+      pokemonImg.style.display = "none";
+      pokemonImg.classList.remove("defend-glow");
+
+      inputLocked = false;
+
+      // Stats
+      badSanta = { name: "Bad Santa", hp: 140, attack: 32, defense: 22, maxHp: 140 };
+      renderSantaStats();
+
+      // Player state
+      playerState.defendActive = false;
+      playerState.healsLeft = 2;
+      btnHeal.textContent = `Heal ❤️ (${playerState.healsLeft})`;
+
+      // Reset resist (new one will be picked on next choose)
+      santaResist = null;
+
+      // Poké Ball back to closed
+      pokeball.src = "/assets/pokeball.png";
+      detachHandlers();
+      currentPokemon = null;
+      statsContainer.classList.add("hidden");
+      statsContainer.innerHTML = "";
+      actionBar.classList.add("hidden");
+    }
+
+    async function chooseRandomPokemon() {
+      pokeball.src = "/assets/open-pokeball.jpg";
+      const pick = pokemons[Math.floor(Math.random() * pokemons.length)];
+      const base = await fetchPokemonStats(pick.id);
+      if (!base) return;
+
+      currentPokemon = {
+        ...base,
+        name: pick.name,   // ensure matching lowercase
+        effect: pick.effect,
+        weapon: pick.weapon,
+      };
+      // Player HP: moderate (longer but fair fight)
+      currentPokemon.maxHp = Math.min(130, Math.max(80, Math.round(base.hp * 2.2)));
+      currentPokemon.hp = currentPokemon.maxHp;
+
+      // Santa gets a random resist for this battle
+      const resistPool = ["electricity","fire","water"];
+      santaResist = resistPool[Math.floor(Math.random() * resistPool.length)];
+
+      // Show Pokémon & stats
+      pokemonImg.src = currentPokemon.image;
+      pokemonImg.style.display = "block";
+      renderPokemonStats();
+
+      // Enable actions
+      actionBar.classList.remove("hidden");
+      setActionsEnabled(true);
+      attachHandlers();
+      playerState.defendActive = false;
+      playerState.healsLeft = 2;
+      btnHeal.textContent = `Heal ❤️ (${playerState.healsLeft})`;
+
+      showBubble(`You chose me, I'm ${cap(currentPokemon.name)}! Santa resists ${santaResist.toUpperCase()} this battle. Choose your action!`);
+    }
+
+    /* ===============================
+       Wire-up
+    ================================*/
+    // Initial Santa card
+    renderSantaStats();
+
+    // Choose Pokémon by clicking the ball
+    pokeball.addEventListener("click", () => {
+      if (pokemonImg.style.display === "block") return; // already chosen
+      chooseRandomPokemon();
+    });
+
+    // Space = Attack
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        if (!inputLocked && currentPokemon) playerAttack();
+      }
+    });
+
+    // Accessibility: prevent image dragging
+    [pokemonImg, pokeball].forEach(el => {
+      el.setAttribute("draggable", "false");
+    });
+
+    // Restart button
+    btnRestart.addEventListener("click", resetGame);
+
+    // Expose for debugging (optional)
+    window.resetGame = resetGame;
+  </script>
+</body>
+</html>
+
+
+
