@@ -1,60 +1,279 @@
-body {
-    background: url('/assets/nature.jpg');
-    background-repeat: no-repeat;
+/* ---------- Bakgrunn og base ---------- */
+:root {
+    --card-bg: #fff;
+    --round: 16px;
+    --accent: #4f46e5;
+    --shadow: 0 8px 24px rgba(0,0,0,.08);
+  }
+  
+  * { box-sizing: border-box; }
+  
+  body {
+    margin: 0;
+    background: url('/assets/nature.jpg') no-repeat center center fixed;
     background-size: cover;
-}
-
-#santa-img {
-width: 380px;
-height: 380px;
-position: fixed;
-right: 75px;
-bottom: 35px;
-transition: transform 0.5s ease;
-}
-#santa-img:hover {
-    transform: translateY(-20px); 
-}
-
-#pokeball {
+    color: #111827;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  }
+  
+  /* ---------- Figurenes posisjon ---------- */
+  #santa-img {
+    width: 380px;
+    height: 380px;
+    position: fixed;
+    right: 75px;
+    bottom: 35px;
+    transition: transform 0.5s ease;
+  }
+  #santa-img:hover { transform: translateY(-20px); }
+  
+  #pokeball {
     width: 160px;
     height: 160px;
     position: absolute;
     left: 280px;
     bottom: 30px;
     transition: transform 0.5s ease;
-}
-#pokeball:hover {
-    transform: translateY(-20px); 
-}
-#pokemon-img {
+    cursor: pointer;
+  }
+  #pokeball:hover { transform: translateY(-20px); }
+  
+  #pokemon-img {
     width: 350px;
-    height: auto; 
+    height: auto;
     position: absolute;
-    left: 390px; 
-    bottom: 130px; 
+    left: 50px;
+    bottom: 150px;
     display: none;
     transition: transform 0.5s ease;
-}
-#pokemon-img:hover {
-    transform: translateY(-20px); 
-}
-.game-description{
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    text-align: left;
-    background-color: #F7E6B2;
-    width: 370px;
-    padding: 8px;
-   margin: 8px;
-    border-radius: 10px;
-    line-height: 25px;
-}
-#attack-effect {
-    display: none;
-    position: absolute;
-    top: 100px; 
-    right: 30px;
-    z-index: 10;
+    cursor: pointer;
+    user-select: none;
   }
-
- 
+  #pokemon-img:hover { transform: translateY(-20px); }
+  
+  /* ---------- HUD: stats-kort ---------- */
+  .hud {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 10px auto 0;
+    max-width: 900px;
+  }
+  
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--round);
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+    width: 220px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .hidden { display: none !important; }
+  
+  .name { font-weight: 700; margin-bottom: 6px; }
+  
+  .statline { font-size: 14px; opacity: .85; margin: 2px 0; }
+  
+  /* HP-bar */
+  .hpbar {
+    margin-top: 8px;
+    height: 14px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+  }
+  .hpbar .fill {
+    height: 100%;
+    width: 100%;
+    transition: width .35s ease, background-color .35s ease;
+    background: #22c55e;
+  }
+  .hpbar .fill.mid { background: #eab308; }
+  .hpbar .fill.low { background: #ef4444; }
+  
+  /* ---------- Snakkeboble ---------- */
+  .bubble {
+    position: fixed;
+    z-index: 200;
+    pointer-events: none;                 /* ikke stjel klikk */
+    top: 65%;                             /* lenger ned */
+    left: auto;
+    right: 45%;                           /* mot høyre */
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 12px;
+    padding: 12px 14px;
+    max-width: 320px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    border: 1px solid #e5e7eb;
+    display: none;
+  }
+  .bubble::after {
+    content: "";
+    position: absolute;
+    right: 20px;
+    bottom: -10px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: rgba(255,255,255,0.85) transparent transparent transparent;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.08));
+  }
+  
+  /* ---------- Konfetti-canvas ---------- */
+  #confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+  }
+  
+  /* ---------- Resultat-overlay ---------- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    display: grid;
+    place-items: center;
+    z-index: 50;
+  }
+  .modal {
+    background: white;
+    border-radius: 22px;
+    padding: 24px;
+    text-align: center;
+    width: min(520px, 92vw);
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  }
+  .modal h1 { margin: 0 0 8px; }
+  .modal p  { margin: 0 0 16px; }
+  
+  .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn:active { transform: translateY(1px); }
+  
+  .result-img {
+    width: 160px;
+    margin: 10px auto 0;
+    display: block;
+  }
+  
+  /* ---------- Lite hint-tekst ---------- */
+  .hint {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 13px;
+    opacity: .7;
+  }
+  
+  /* Santa telegraph (pulse) før angrep */
+  .santa-telegraph {
+    animation: santaPulse 0.9s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, .45));
+  }
+  @keyframes santaPulse {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-6px) scale(1.03); }
+  }
+  
+  /* Treff-animasjoner (shake) */
+  .santa-hit {
+    animation: santaShake 0.4s ease;
+  }
+  @keyframes santaShake {
+    0%   { transform: translate(0, 0) rotate(0); }
+    25%  { transform: translate(-8px, 0) rotate(-3deg); }
+    50%  { transform: translate(8px, 0) rotate(3deg); }
+    75%  { transform: translate(-6px, 0) rotate(-2deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+  }
+  .pokemon-hit {
+    animation: pokemonShake 0.4s ease;
+  }
+  @keyframes pokemonShake {
+    0%   { transform: translate(0, 0) rotate(0); }
+    25%  { transform: translate(8px, 0) rotate(3deg); }
+    50%  { transform: translate(-8px, 0) rotate(-3deg); }
+    75%  { transform: translate(6px, 0) rotate(2deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+  }
+  
+  /* Defend visual glow */
+  .defend-glow {
+    box-shadow:
+      0 0 0 6px rgba(59,130,246,.35),
+      0 0 0 14px rgba(59,130,246,.15),
+      0 8px 24px rgba(0,0,0,.25);
+    border-radius: 24px;
+    transition: box-shadow .2s ease;
+  }
+  
+  /* Rules card */
+  .rules-card {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 280px;
+    background: rgba(255,255,255,.9);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 10px 12px;
+    z-index: 90;
+  }
+  .rules-card h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+  }
+  .rules-card ul {
+    margin: 0; padding-left: 18px;
+    font-size: 13px; line-height: 1.25rem;
+  }
+  
+  /* Action bar */
+  .action-bar {
+    position: fixed;
+    left: 40px;
+    bottom: 40px;
+    display: flex;
+    gap: 10px;
+    z-index: 80;
+  }
+  .action-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  }
+  .action-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+  .action-btn:active {
+    transform: translateY(1px);
+  }
+  
+  /* Responsiv plassering av pokéball/Pokémon */
+  @media (max-width: 1100px) {
+    #pokeball { left: 50%; bottom: 20px; transform: translateX(-60%); }
+    #pokemon-img { left: 50%; bottom: 160px; transform: translateX(-20%); }
+  }
+  @media (max-width: 720px) {
+    .rules-card { width: auto; margin: 8px; }
+    #pokeball { left: 50%; bottom: 20px; transform: translateX(-50%); }
+    #pokemon-img { left: 50%; bottom: 160px; transform: translateX(-50%); }
+  }
+  
+    

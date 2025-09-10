@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JS & API EKSAMEN</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+     <!-- lagrede pokemons container -->
+     <h1>Pokemon-oversikt</h1>
+     <h2>Lagrede Pokemons:</h2>
+ <div id="saved-favorites-container"> 
+ </div>
+    <!--lag din egen pokemon-container -->
+    <div id="create-your-own-container"> 
+      <!--lag din egen pokemon - valg av pokemontype: -->
+      <h2>Lag din egen Pokemon:</h2>
+      <label class="type-select-txt" for="typeSelect">Hvilken <strong>type</strong> er <strong><em>din</em></strong> Pokemon? Velg:</label>
+      <select id="typeSelect">
+          <option value="normal">Normal</option>
+          <option value="fighting">Fighting</option>
+          <option value="flying">Flying</option>
+          <option value="poison">Poison</option>
+          <option value="ground">Ground</option>
+          <option value="rock">Rock</option>
+          <option value="bug">Bug</option>
+          <option value="ghost">Ghost</option>
+          <option value="steel">Steel</option>
+          <option value="fire">Fire</option>
+          <option value="water">Water</option>
+          <option value="grass">Grass</option>
+          <option value="electric">Electric</option>
+          <option value="psychic">Psychic</option>
+          <option value="ice">Ice</option>
+          <option value="dragon">Dragon</option>
+          <option value="dark">Dark</option>
+          <option value="fairy">Fairy</option>
+      </select>
+      <button id="create-your-own-btn">Vis Pokemonkort</button>
+  </section>
+</div>
+  <!-- ulike pokemontyper (knapper) container-->
+  <div id="types-container"></div>
+<!--alle pokemonkort - container -->
+    <div id="pokemon-cards-container">
+        </div>
+     
+    <script src="script.js"></script>
+  </body>
+</html>
